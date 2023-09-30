@@ -1,31 +1,66 @@
 "use client";
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Burger from './burger'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
 import './navbar.css'
 
 const NavBar = () => {
-    const [Toggle, setToggle] = useState()
-    "load resize".split(" ").forEach(function (e) {
-        window.addEventListener(e, () => {
-            if (window.innerWidth < 768) {
-                setToggle(false);
-            } else {
-                setToggle(true);
-            }
-        })
-    });
-    window.addEventListener('scroll', () => {
-        if (window.pageYOffset > 50) {
-            if (document.getElementById("Fixed")) { document.getElementById("Fixed").style.background = "url('/background.jpg')"; }
-        } else {
-            if (document.getElementById("Fixed")) { document.getElementById("Fixed").style.background = "transparent"; }
+    const [toggle, setToggle] = useState();
+
+    useEffect(() => {
+        // Check if we're on the client side before using window
+        if (typeof window !== 'undefined') {
+            // Add event listeners for 'load' and 'resize'
+            const handleResize = () => {
+                if (window.innerWidth < 768) {
+                    setToggle(false);
+                } else {
+                    setToggle(true);
+                }
+            };
+
+            // Add event listeners
+            ["load", "resize"].forEach((e) => {
+                window.addEventListener(e, handleResize);
+            });
+
+            // Remove event listeners when component unmounts
+            return () => {
+                ["load", "resize"].forEach((e) => {
+                    window.removeEventListener(e, handleResize);
+                });
+            };
         }
-    })
+    }, []);
+
+    useEffect(() => {
+        // Check if we're on the client side before using window
+        if (typeof window !== 'undefined') {
+            const handleScroll = () => {
+                if (window.pageYOffset > 50) {
+                    if (document.getElementById("Fixed")) {
+                        document.getElementById("Fixed").style.background = "url('/background.jpg')";
+                    }
+                } else {
+                    if (document.getElementById("Fixed")) {
+                        document.getElementById("Fixed").style.background = "transparent";
+                    }
+                }
+            };
+
+            // Add scroll event listener
+            window.addEventListener('scroll', handleScroll);
+
+            // Remove scroll event listener when component unmounts
+            return () => {
+                window.removeEventListener('scroll', handleScroll);
+            };
+        }
+    }, []);
     return (
         <>
-            {Toggle
+            {toggle
                 ?
                 <nav id="Fixed" className='bg-transparent flex flex-row justify-between gap-[40px] px-14 items-center text-white text-xl py-4 fixed top-0 w-full z-50 transition-all duration-100 ease-in-out'>
                     <div className='w-36 min-w-[140px]'>
